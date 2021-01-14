@@ -10,13 +10,72 @@
 <body>
 
     <div class="controls">
-        CONTROLS
+        <div class="inputs">
+            <div class="curtain">
+                hidden curtain
+            </div>
+            <div class="axis">
+                <div class="image">
+                    <img src="#" alt="#">
+                </div>
+                <div class="inputInfo xAxis">
+                    <span class="description">
+                        Lenght of field:
+                    </span>
+                    <span class="restriction">
+                        Lenght accepts integers which are not less than 2
+                    </span>
+                </div>
+                <div class="input">
+                    <input type="number" min="2" value="2">
+                </div>
+            </div>
+            <div class="axis">
+                <div class="image">
+                    <img src="#" alt="#">
+                </div>
+                <div class="inputInfo yAxis">
+                    <span class="description">
+                        Height of field:
+                    </span>
+                    <span class="restriction">
+                        Height accepts integers which are not less than 2
+                    </span>
+                </div>
+                <div class="input">
+                    <input type="number" min="2" value="2">
+                </div>
+            </div>
+        </div>
+        <div class="transport">
+            <div>
+                <button type="button" class="start"> START </button>
+            </div>
+            <div>
+                <button type="button" class="kill"> KILL </button>
+            </div>
+        </div>
     </div>
     <div class="render">
-        RENDER
+        <div id="field">
+            field
+        </div>
+        <div class="edit">
+            <div>
+                <button type="button" class="manual"> MANUAL </button>
+            </div>
+            <div>
+                <button type="button" class="random"> RANDOM </button>
+            </div>
+        </div>
     </div>
     <div class="info">
-        INFO
+        <div class="primeFrame">
+            prime frame
+        </div>
+        <div class="links">
+            links
+        </div>
     </div>
     
 </body>
