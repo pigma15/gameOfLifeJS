@@ -1,0 +1,29 @@
+.render {
+    display: inline-block;
+    width: 100%;
+    margin-top: 10px;
+}
+    #field {
+        display: grid;
+        float: left;
+        place-items: center;
+        width: 80%;
+        height: 100%;
+    }
+    .edit {
+        display: inline-block;
+        float: left;
+        width: 20%;
+        height: 100%;
+    }
+        .edit > div {
+            display: grid;
+            place-items: center;
+            width: 100%;
+            height: 50%;
+        }
+            .edit button {
+                display: inline-block;
+                width: 80%;
+                height: 80%;
+            }
