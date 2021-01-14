@@ -8,7 +8,7 @@
         float: left;
         place-items: center;
         width: 80%;
-        height: 100%;
+        height: 400px; /* 100% */
     }
     .edit {
         display: inline-block;
