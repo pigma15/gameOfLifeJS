@@ -1,0 +1,18 @@
+.info {
+    display: inline-block;
+    width: 100%;
+    margin-top: 10px;
+}
+    #primeFrame {
+        display: grid;
+        float: left;
+        place-items: center;
+        width: 50%;
+        height: 100%;
+    }
+    .links {
+        display: inline-block;
+        float: left;
+        width: 50%;
+        height: 100%;
+    }

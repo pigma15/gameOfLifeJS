@@ -1,0 +1,71 @@
+.controls {
+    display: inline-block;
+    width: 100%;
+    margin-top: 50px;
+}
+    .inputs {
+        display: inline-block;
+        float: left;
+        width: 75%;
+        height: 100%;
+    }
+        .curtain {
+            display: none;
+        }
+        .axis {
+            display: inline-block;
+            width: 100%;
+            height: 50%;
+        }
+            .image {
+                display: inline-block;
+                float: left;
+                width: 20%;
+                height: 100%;
+            }
+                .image > img {
+                    display: inline-block;
+                    width: 100%;
+                    height: 100%;
+                }
+            .inputInfo {
+                display: inline-block;
+                float: left;
+                width: 50%;
+                height: 100%;
+            }
+                .inputInfo > span {
+                    display: inline-block;
+                    width: 100%;
+                    height: 50%;
+                    text-align: right;
+                }
+            .input {
+                display: inline-block;
+                float: left;
+                width: 30%;
+                height: 100%;
+            }
+                .input > input {
+                    display: inline-block;
+                    float: left;
+                    width: 25%;
+                    height: 75%;
+                }
+    .transport {
+        display: inline-block;
+        float: left;
+        width: 25%;
+        height: 100%;
+    }
+        .transport > div {
+            display: grid;
+            place-items: center;
+            width: 100%;
+            height: 50%;
+        }
+            .transport button {
+                display: inline-block;
+                width: 80%;
+                height: 80%;
+            }
