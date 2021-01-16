@@ -18,11 +18,12 @@ class GameOfLifeEngine {
 
         this.isPlaying = false;
         this.isEditable = true;
+        this.runCount = 0;
         this.isEqualFound = false;
         this.firstEqual = 0;
         this.lastEqual = 0; 
 
-        this.fps = 1000 / 8;
+        this.fps = 1000 / 3;
 
         this.init();
     }
@@ -66,6 +67,7 @@ class GameOfLifeEngine {
             this.renderOneField(true);
             this.isPlayingState(false);
             this.editField();
+            this.runCount = 0;
             return;
         }
         this.yAxisBtn.onclick = () => {
@@ -75,6 +77,7 @@ class GameOfLifeEngine {
             this.renderOneField(true);
             this.isPlayingState(false);
             this.editField();
+            this.runCount = 0;
             return;
         }
     }
@@ -84,6 +87,7 @@ class GameOfLifeEngine {
             this.renderOneField(true);
             this.isEditable = true;
             this.editField();
+            this.runCount = 0;
             return;
         }
         this.resetBtn.onclick = () => {
@@ -91,6 +95,7 @@ class GameOfLifeEngine {
             this.renderOneField(false);
             this.isEditable = true;
             this.editField();
+            this.runCount = 0;
             return;
         }
     }
@@ -140,6 +145,7 @@ class GameOfLifeEngine {
                 field[i] ? field[i] = false : field[i] = true;
                 spot.classList.toggle('full');
                 this.memory[0][i] = field[i];
+                this.isEqualFound = false;
             })
         }
 
@@ -154,8 +160,10 @@ class GameOfLifeEngine {
                     clearTimeout(time);
                     return;
                 }
+                this.iteration++;
                 this.makeNewField();
                 this.compareFields();
+                this.postRender();
                 !this.isPlaying ? clearTimeout(time) : timer();
             }, this.fps);
             timer();
@@ -173,7 +181,7 @@ class GameOfLifeEngine {
         }
     }
     makeNewField() {
-        this.iteration++;
+        if (this.isEqualFound) return;
         let field = [];
         const fieldSize = this.length * this.height;
         for (let i = 0; i < fieldSize; i++) {
@@ -226,15 +234,32 @@ class GameOfLifeEngine {
                 if (this.memory[check][j] === field[j]) checkCount++;
             }
             if (checkCount === fieldSize) {
-                if (this.lastEqual - this.firstEqual === 1) console.log('static');
-                this.isEqualFound = true;
-                this.isPlayingState(false);
-                this.renderOneField('static')
-                this.isEditable = true;
-                this.editField();
-                this.iteration = 0;
+                if (this.lastEqual - this.firstEqual === 1) {
+                    this.isPlayingState(false);
+                    this.renderOneField('static')
+                    this.isEditable = true;
+                    this.editField();
+                    this.iteration = 0;
+                }
+                this.isEqualFound = true;            
                 return;
             }
+        }
+    }
+    postRender() {
+        if (!this.isPlaying) return;
+        if (this.isEqualFound) {
+            this.runCount++;
+            let position = (this.runCount + 1) % (this.lastEqual - this.firstEqual);
+            let field = [];
+            const fieldSize = this.length * this.height;
+            for (let i = 0; i < fieldSize; i++) {
+                const spot = this.spotsDOMs[i];
+                field.push(this.memory[this.firstEqual + position][i]);
+                this.memory[this.firstEqual + position][i] ?  spot.classList.add('full', 'super') : spot.classList.remove('full', 'super');
+            }
+            this.memory[this.iteration] = field;
+            return;
         }
     }
 

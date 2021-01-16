@@ -27,6 +27,9 @@
             .grid .spot.full {
                 background-color: #222;
             }
+            .grid .spot.full.super {
+                background-color: blue;
+            }
     #edit {
         display: inline-block;
         float: left;
