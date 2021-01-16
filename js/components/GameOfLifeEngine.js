@@ -3,188 +3,173 @@ class GameOfLifeEngine {
         this.DOM = document.querySelector(data.selector);
         this.spotsDOMs = null;
 
-        this.memory = [];
+        this.startBtn = document.querySelector('.start');
+        this.killBtn = document.querySelector('.kill');
+        this.xAxisBtn = document.querySelector('.xInput');
+        this.yAxisBtn = document.querySelector('.yInput');
+        this.resetBtn = document.querySelector('.reset');
+        this.randomBtn = document.querySelector('.random');
+
+        this.length = +(document.querySelector('.xInput').value);
+        this.height = +(document.querySelector('.yInput').value);
+
         this.iteration = 0;
-        this.isRandom = true;
-        this.isRunning = false;
-        this.isEqual = false;
-        this.isSpots = false;
+        this.memory = [0];
 
-        this.equal = [];
-        this.firstEqual = 0;
-        this.lastEqual = 0;
+        this.isPlaying = false;
+        this.isEditable = true;
 
-        this.xAxis = +(document.querySelector('.xInput').value);
-        this.yAxis = +(document.querySelector('.yInput').value);
-
-        this.start = document.querySelector('.start');
-        this.kill = document.querySelector('.kill');
-        this.random = document.querySelector('.random');
-        this.reset = document.querySelector('.reset');
-        this.xInput = document.querySelector('.xInput');
-        this.yInput = document.querySelector('.yInput');
+        this.fps = 1000 / 7;
 
         this.init();
     }
     init() {
-        this.renderOne();
-        this.spots();
-        this.switches();
+        this.killBtn.disabled = true;
+        this.renderOneField(true);
         this.changeDimensions();
-        this.run();
+        this.generateNewField();
+        this.editField();
+        this.start();
+        this.kill();
     }
-    switches() {
-        this.random.onclick = () => (this.isRandom = true, this.isRunning = false, this.isEqual = false, this.isSpots = false, this.renderOne(), this.spots());
-        this.reset.onclick = () => (this.isRandom = false, this.isRunning = false, this.isEqual = false, this.isSpots = false, this.renderOne(), this.spots());
-        this.kill.onclick = () => {
-            this.isRunning = false;
-            this.isEqual = false;
-            this.isRandom = false;
-            this.spots();
+    isPlayingState(state) {
+        if(state) {
+            this.isPlaying = true;
+            this.isEditable = false;
+            this.startBtn.disabled = true;
+            this.xAxisBtn.disabled = true;
+            this.yAxisBtn.disabled = true;
+            this.resetBtn.disabled = true;
+            this.randomBtn.disabled = true;
+            this.killBtn.disabled = false;
+        } else {
+            this.isPlaying = false;
+            this.isEditable = true;
+            this.killBtn.disabled = true;
+            this.xAxisBtn.disabled = false;
+            this.yAxisBtn.disabled = false;
+            this.resetBtn.disabled = false;
+            this.randomBtn.disabled = false;
+            this.startBtn.disabled = false;         
         }
+        return;
     }
-
     changeDimensions() {
-        this.xInput.onclick = () => {
-            this.xAxis = +(document.querySelector('.xInput').value);
-            this.isRunning = false;
-            this.isEqual = false;
-            this.isSpots = false;
-            this.renderOne();
-            this.spots();
+        this.xAxisBtn.onclick = () => {
+            if (this.isPlaying) return;
+            this.length = +(document.querySelector('.xInput').value);
+            this.height = +(document.querySelector('.yInput').value);
+            this.renderOneField(true);
+            this.isPlayingState(false);
+            this.editField();
+            return;
         }
-        this.yInput.onclick = () => {
-            this.yAxis = +(document.querySelector('.yInput').value);
-            this.isRunning = false;
-            this.isEqual = false;
-            this.isSpots = false;
-            this.renderOne();
-            this.spots();
+        this.yAxisBtn.onclick = () => {
+            if (this.isPlaying) return;
+            this.length = +(document.querySelector('.xInput').value);
+            this.height = +(document.querySelector('.yInput').value);
+            this.renderOneField(true);
+            this.isPlayingState(false);
+            this.editField();
+            return;
         }
     }
-
-    renderOne() {
-        if (this.isRunning) return;
-        this.iteration = 0;
-        this.memory = [0]
+    generateNewField() {
+        this.randomBtn.onclick = () => {
+            if (this.isPlaying) return;
+            this.renderOneField(true);
+            this.isEditable = true;
+            this.editField();
+            return;
+        }
+        this.resetBtn.onclick = () => {
+            if (this.isPlaying) return;
+            this.renderOneField(false);
+            this.isEditable = true;
+            this.editField();
+            return;
+        }
+    }
+    renderOneField(random) {
+        if (this.isPlaying) return;
         let field = [];
-        const fieldSize = this.xAxis * this.yAxis;
-        let HTML = `<div class="grid" style="grid-template-columns: repeat(${this.xAxis}, 1fr); grid-template-rows: repeat(${this.yAxis}, 1fr);">`;
-        if (this.isRandom) {
+        const fieldSize = this.length * this.height;
+        let HTML = `<div class="grid" style="grid-template-columns: repeat(${this.length}, 1fr); grid-template-rows: repeat(${this.height}, 1fr);">`;
+        if (random === 'last') {
+            if (this.iteration > 0) this.iteration -= 1;
+            field = this.memory[0];
             for (let i = 0; i < fieldSize; i++) {
-                Math.random() > 0.23 ? (HTML += '<div class="spot"></div>', field.push(false)) : (HTML += '<div class="spot full"></div>', field.push(true));
+                field[i] ? HTML += '<div class="spot full"></div>' : HTML += '<div class="spot"></div>';
             }
         } else {
-            for (let i = 0; i < fieldSize; i++) {
-                HTML += '<div class="spot"></div>';
-                field.push(false);
+            if (random) {
+                for (let i = 0; i < fieldSize; i++) {
+                    Math.random() > 0.23 ? (HTML += '<div class="spot"></div>', field.push(false)) : (HTML += '<div class="spot full"></div>', field.push(true));
+                }
+            } else {
+                for (let i = 0; i < fieldSize; i++) {
+                    HTML += '<div class="spot"></div>';
+                    field.push(false);
+                }
             }
         }
+        this.memory = [0];
         this.memory[0] = field;
         HTML += `</div>`;
         this.DOM.innerHTML = HTML;
         this.spotsDOMs = document.querySelectorAll('.spot');
-        this.isRandom = false;
         return;
-    }
-
-    run() {
-        this.start.onclick = () => {
-            if (this.isRunning) return;
-            this.isRunning = true;
-            this.isEqual = false;
-            const fieldSize = this.xAxis * this.yAxis;
-            let timer =
-            setInterval(() => {
-                if(!this.isRunning) {
-                    clearInterval(timer);
-                    const lastFrame = this.memory[this.iteration];
-                    this.memory = [0];
-                    this.memory[0] = lastFrame;
-                    this.iteration = 0;
-                    return;
-                }
-                this.iteration++;
-                let field = [];
-                for (let i = 0; i < fieldSize; i++) {
-                    const prev = this.memory[this.iteration - 1];
-                    const spot = this.spotsDOMs[i];
-                    let checkNeigh = 0;
-                    if (i - this.xAxis > -1) {
-                        if (i % this.xAxis > 0) {
-                            if (prev[i - this.xAxis - 1]) checkNeigh++;
-                        }
-                        if (i % this.xAxis < this.xAxis - 1) {
-                            if (prev[i - this.xAxis + 1]) checkNeigh++;
-                        }
-                        if (prev[i - this.xAxis]) checkNeigh++;
-                    }
-                    if (i + this.xAxis < fieldSize) {
-                        if (i % this.xAxis > 0) {
-                            if (prev[i + this.xAxis - 1]) checkNeigh++;
-                        }
-                        if (i % this.xAxis < this.xAxis - 1) {
-                            if (prev[i + this.xAxis + 1]) checkNeigh++;
-                        }
-                        if (prev[i + this.xAxis]) checkNeigh++;
-                    }
-                    if (i % this.xAxis > 0) {
-                        if (prev[i - 1]) checkNeigh++;
-                    }
-                    if (i % this.xAxis < this.xAxis - 1) {
-                        if (prev[i + 1]) checkNeigh++;
-                    }
-                    if (prev[i]) {
-                        (checkNeigh === 2 || checkNeigh === 3) ? (field.push(true), spot.classList.add('full')) : (field.push(false), spot.classList.remove('full'));
-                    } else {
-                        checkNeigh === 3 ? (field.push(true), spot.classList.add('full')) : (field.push(false), spot.classList.remove('full'));
-                    }
-                }
-                this.memory[this.iteration] = field;
-                if (!this.isEqual) {
-                    for (let i = this.iteration - 1; i >= 0; i--) {
-                        let checkCount = 0;
-                        const check = i;
-                        for (let j = 0; j < fieldSize; j++) {
-                            if (this.memory[check][j] === field[j]) checkCount++;
-                        }
-                        if (checkCount === fieldSize) {
-                            this.firstEqual = check;
-                            this.lastEqual = this.iteration;
-                            this.equal = field;
-                            this.isEqual = true;
-                            return;
-                        }
-                    }
-                }
-            }, 150);
-        }
         
-
     }
-
-    spots() {
-        if (this.isSpots) {
-            return;
-        }
-        this.isSpots = true;
+    editField() {
+        if (!this.isEditable) return;
+        this.isEditable = false;
         for (let i = 0; i < this.spotsDOMs.length; i++) {
             const spot = this.spotsDOMs[i];
             spot.addEventListener('click', () => {
-                if (this.isRunning) {
-                    return;
-                }
+                if (this.isPlaying) return;
                 let field = this.memory[0];
-                this.isRandom = false;
                 field[i] ? field[i] = false : field[i] = true;
                 spot.classList.toggle('full');
-                this.memory[0] = field;
-                this.iteration = 0;
-                console.log(spot);
-            });
+                this.memory[0][i] = field[i];
+            })
+        }
+
+    }
+    start() {
+        this.startBtn.onclick = () => {
+            if (this.isPlaying) return;
+            this.isPlayingState(true);
+            let timer = time =>
+            setTimeout(() => {
+                if (!this.isPlaying) {
+                    clearTimeout(time);
+                    return;
+                }
+                this.iteration++;
+                this.run();
+                !this.isPlaying ? clearTimeout(time) : timer();
+            }, this.fps);
+            timer();
+            
         }
     }
-    
+    kill() {
+        this.killBtn.onclick = () => {
+            this.isPlayingState(false);
+            this.renderOneField('last')
+            this.isEditable = true;
+            this.editField();
+            return;
+        }
+    }
+    run() {
+        // generate new from previous last
+        if (this.isPlaying) return;
+        const fieldSize = this.length * this.height;
+
+    }
+
 }
 
 export { GameOfLifeEngine }
