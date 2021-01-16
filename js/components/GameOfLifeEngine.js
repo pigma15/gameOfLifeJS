@@ -8,6 +8,11 @@ class GameOfLifeEngine {
         this.isRandom = true;
         this.isRunning = false;
         this.isEqual = false;
+        this.isSpots = false;
+
+        this.equal = [];
+        this.firstEqual = 0;
+        this.lastEqual = 0;
 
         this.xAxis = +(document.querySelector('.xInput').value);
         this.yAxis = +(document.querySelector('.yInput').value);
@@ -19,33 +24,42 @@ class GameOfLifeEngine {
         this.xInput = document.querySelector('.xInput');
         this.yInput = document.querySelector('.yInput');
 
-        // keiciant rezoliucija perpiesia nauja random if random arba tuscia if manual
-        // paspaudus start pradeda tikrinti esama field ir is jo sukuria nauja, tada ji tikrina ar nepasikartojo
-
         this.init();
     }
     init() {
         this.renderOne();
-        this.randomSwitch();
+        this.spots();
+        this.switches();
         this.changeDimensions();
         this.run();
     }
-    randomSwitch() {
-        this.random.onclick = () => (this.isRandom = true, this.renderOne());
-        this.reset.onclick = () => (this.isRandom = false, this.renderOne());
+    switches() {
+        this.random.onclick = () => (this.isRandom = true, this.isRunning = false, this.isEqual = false, this.isSpots = false, this.renderOne(), this.spots());
+        this.reset.onclick = () => (this.isRandom = false, this.isRunning = false, this.isEqual = false, this.isSpots = false, this.renderOne(), this.spots());
         this.kill.onclick = () => {
             this.isRunning = false;
+            this.isEqual = false;
+            this.isRandom = false;
+            this.spots();
         }
     }
 
     changeDimensions() {
         this.xInput.onclick = () => {
             this.xAxis = +(document.querySelector('.xInput').value);
+            this.isRunning = false;
+            this.isEqual = false;
+            this.isSpots = false;
             this.renderOne();
+            this.spots();
         }
         this.yInput.onclick = () => {
             this.yAxis = +(document.querySelector('.yInput').value);
+            this.isRunning = false;
+            this.isEqual = false;
+            this.isSpots = false;
             this.renderOne();
+            this.spots();
         }
     }
 
@@ -70,6 +84,7 @@ class GameOfLifeEngine {
         HTML += `</div>`;
         this.DOM.innerHTML = HTML;
         this.spotsDOMs = document.querySelectorAll('.spot');
+        this.isRandom = false;
         return;
     }
 
@@ -77,6 +92,7 @@ class GameOfLifeEngine {
         this.start.onclick = () => {
             if (this.isRunning) return;
             this.isRunning = true;
+            this.isEqual = false;
             const fieldSize = this.xAxis * this.yAxis;
             let timer =
             setInterval(() => {
@@ -133,6 +149,9 @@ class GameOfLifeEngine {
                             if (this.memory[check][j] === field[j]) checkCount++;
                         }
                         if (checkCount === fieldSize) {
+                            this.firstEqual = check;
+                            this.lastEqual = this.iteration;
+                            this.equal = field;
                             this.isEqual = true;
                             return;
                         }
@@ -142,6 +161,28 @@ class GameOfLifeEngine {
         }
         
 
+    }
+
+    spots() {
+        if (this.isSpots) {
+            return;
+        }
+        this.isSpots = true;
+        for (let i = 0; i < this.spotsDOMs.length; i++) {
+            const spot = this.spotsDOMs[i];
+            spot.addEventListener('click', () => {
+                if (this.isRunning) {
+                    return;
+                }
+                let field = this.memory[0];
+                this.isRandom = false;
+                field[i] ? field[i] = false : field[i] = true;
+                spot.classList.toggle('full');
+                this.memory[0] = field;
+                this.iteration = 0;
+                console.log(spot);
+            });
+        }
     }
     
 }
