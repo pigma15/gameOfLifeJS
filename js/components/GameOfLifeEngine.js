@@ -18,8 +18,11 @@ class GameOfLifeEngine {
 
         this.isPlaying = false;
         this.isEditable = true;
+        this.isEqualFound = false;
+        this.firstEqual = 0;
+        this.lastEqual = 0; 
 
-        this.fps = 1000 / 7;
+        this.fps = 1000 / 8;
 
         this.init();
     }
@@ -33,9 +36,10 @@ class GameOfLifeEngine {
         this.kill();
     }
     isPlayingState(state) {
-        if(state) {
+        if (state) {
             this.isPlaying = true;
             this.isEditable = false;
+            this.isEqualFound = false;;
             this.startBtn.disabled = true;
             this.xAxisBtn.disabled = true;
             this.yAxisBtn.disabled = true;
@@ -95,24 +99,28 @@ class GameOfLifeEngine {
         let field = [];
         const fieldSize = this.length * this.height;
         let HTML = `<div class="grid" style="grid-template-columns: repeat(${this.length}, 1fr); grid-template-rows: repeat(${this.height}, 1fr);">`;
-        if (random === 'last') {
-            if (this.iteration > 0) this.iteration -= 1;
-            field = this.memory[0];
+        if (random === 'static') {
+            field = this.memory[this.iteration];
             for (let i = 0; i < fieldSize; i++) {
                 field[i] ? HTML += '<div class="spot full"></div>' : HTML += '<div class="spot"></div>';
             }
+        } else if (random === 'last') {
+            if (this.iteration > 1) this.iteration -= 1;
+            field = this.memory[this.iteration - 1];
+            for (let i = 0; i < fieldSize; i++) {
+                field[i] ? HTML += '<div class="spot full"></div>' : HTML += '<div class="spot"></div>';
+            }
+        } else if (random) {
+            for (let i = 0; i < fieldSize; i++) {
+                Math.random() > 0.23 ? (HTML += '<div class="spot"></div>', field.push(false)) : (HTML += '<div class="spot full"></div>', field.push(true));
+            }
         } else {
-            if (random) {
-                for (let i = 0; i < fieldSize; i++) {
-                    Math.random() > 0.23 ? (HTML += '<div class="spot"></div>', field.push(false)) : (HTML += '<div class="spot full"></div>', field.push(true));
-                }
-            } else {
-                for (let i = 0; i < fieldSize; i++) {
-                    HTML += '<div class="spot"></div>';
-                    field.push(false);
-                }
+            for (let i = 0; i < fieldSize; i++) {
+                HTML += '<div class="spot"></div>';
+                field.push(false);
             }
         }
+        
         this.memory = [0];
         this.memory[0] = field;
         HTML += `</div>`;
@@ -146,8 +154,8 @@ class GameOfLifeEngine {
                     clearTimeout(time);
                     return;
                 }
-                this.iteration++;
-                this.run();
+                this.makeNewField();
+                this.compareFields();
                 !this.isPlaying ? clearTimeout(time) : timer();
             }, this.fps);
             timer();
@@ -160,14 +168,74 @@ class GameOfLifeEngine {
             this.renderOneField('last')
             this.isEditable = true;
             this.editField();
+            this.iteration = 0;
             return;
         }
     }
-    run() {
-        // generate new from previous last
-        if (this.isPlaying) return;
+    makeNewField() {
+        this.iteration++;
+        let field = [];
         const fieldSize = this.length * this.height;
+        for (let i = 0; i < fieldSize; i++) {
+            const prev = this.memory[this.iteration - 1];
+            const spot = this.spotsDOMs[i];
+            let checkNeigh = 0;
+            if (i - this.length > -1) {
+                if (i % this.length > 0) {
+                    if (prev[i - this.length - 1]) checkNeigh++;
+                }
+                if (i % this.length < this.length - 1) {
+                    if (prev[i - this.length + 1]) checkNeigh++;
+                }
+                if (prev[i - this.length]) checkNeigh++;
+            }
+            if (i + this.length < fieldSize) {
+                if (i % this.length > 0) {
+                    if (prev[i + this.length - 1]) checkNeigh++;
+                }
+                if (i % this.length < this.length - 1) {
+                    if (prev[i + this.length + 1]) checkNeigh++;
+                }
+                if (prev[i + this.length]) checkNeigh++;
+            }
+            if (i % this.length > 0) {
+                if (prev[i - 1]) checkNeigh++;
+            }
+            if (i % this.length < this.length - 1) {
+                if (prev[i + 1]) checkNeigh++;
+            }
+            if (prev[i]) {
+                (checkNeigh === 2 || checkNeigh === 3) ? (field.push(true), spot.classList.add('full')) : (field.push(false), spot.classList.remove('full'));
+            } else {
+                checkNeigh === 3 ? (field.push(true), spot.classList.add('full')) : (field.push(false), spot.classList.remove('full'));
+            }
+            this.memory[this.iteration] = field;
+        }
 
+    }
+    compareFields() {
+        if (this.isEqualFound) return;
+        const fieldSize = this.length * this.height;
+        for (let i = this.iteration - 1; i >= 0; i--) {
+            const field = this.memory[this.iteration];
+            this.firstEqual = i;
+            this.lastEqual = this.iteration;
+            const check = i;
+            let checkCount = 0;
+            for (let j = 0; j < fieldSize; j++) {
+                if (this.memory[check][j] === field[j]) checkCount++;
+            }
+            if (checkCount === fieldSize) {
+                if (this.lastEqual - this.firstEqual === 1) console.log('static');
+                this.isEqualFound = true;
+                this.isPlayingState(false);
+                this.renderOneField('static')
+                this.isEditable = true;
+                this.editField();
+                this.iteration = 0;
+                return;
+            }
+        }
     }
 
 }
