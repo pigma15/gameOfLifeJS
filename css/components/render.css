@@ -8,27 +8,52 @@
         float: left;
         place-items: center;
         width: 80%;
-        height: 400px; /* 100% */
+        height: 500px; /* 100% */
     }
         #field > .grid {
-            background-color: #aaa;
+            background-color: hsla(85, 35%, 50%);
             display: grid;
             width: 100%;
             height: 100%;
+            box-shadow: inset 0 0 30px 20px hsla(85, 35%, 5%, 40%);
+            transition: 0.8s;
+            animation-name: shiningFrame;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+            animation-direction: alternate;
+            animation-play-state: paused;
+        }
+        #field > .grid.running {
+            animation-play-state: running;
+        }
+        @keyframes shiningFrame {
+            0% {
+                box-shadow: inset 0 0 30px 20px hsla(85, 35%, 5%, 50%);
+            }
+            100% {
+                box-shadow: inset 0 0 35px 30px hsla(85, 90%, 15%, 75%);
+            }
         }
             .grid .spot {
-                background-color: #ddd;
+                background-color: #ddd2;
                 display: inline-block;
                 grid-column: auto / span 1;
                 width: 100%;
                 height: 100%;
+                cursor: pointer;
                 transition: ease-in-out 0.1s;
+                border: 1px solid #888;
+                box-shadow: none;
             }
             .grid .spot.full {
                 background-color: #222;
+                border: none;
             }
-            .grid .spot.full.super {
-                background-color: blue;
+            .grid .spot.loop {
+                background-color: #120;
+            }
+            .grid .spot.static {
+                background-color: #012;
             }
     #edit {
         display: inline-block;
