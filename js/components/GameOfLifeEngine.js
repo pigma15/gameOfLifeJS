@@ -292,11 +292,11 @@ class GameOfLifeEngine {
             this.firstEqual = i;
             this.lastEqual = this.iteration;
             const check = i;
-            let checkCount = 0;
-            for (let j = 0; j < fieldSize; j++) {
-                if (this.memory[check][j] === field[j]) checkCount++;
+            let match = true;
+            for (let j = 0; match && j < fieldSize; j++) {
+                if (this.memory[check][j] !== field[j]) match = false;
             }
-            if (checkCount === fieldSize) {
+            if (match) {
                 if (this.lastEqual - this.firstEqual === 1) {
                     this.isPlayingState(false);
                     this.renderOneField('static')

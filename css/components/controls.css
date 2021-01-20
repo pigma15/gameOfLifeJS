@@ -1,12 +1,18 @@
 .controls {
     display: inline-block;
     width: 100%;
-    margin-top: 50px;
+    height: 15vh;
+    margin-top: 3vh;
+    margin-bottom: 2vh;
+    border-top-left-radius: 20px;
+    border-top-right-radius:  20px;
+    box-shadow: inset 0 0 5px 10px #333a;
+    /*overflow: hidden; */
 }
     .inputs {
         display: inline-block;
         float: left;
-        width: 75%;
+        width: 80%;
         height: 100%;
     }
         .curtain {
@@ -25,6 +31,7 @@
             }
                 .image > img {
                     display: inline-block;
+                    display: none;
                     width: 100%;
                     height: 100%;
                 }
@@ -41,6 +48,7 @@
                     text-align: right;
                 }
             .input {
+                background-color: yellow;
                 display: inline-block;
                 float: left;
                 width: 30%;
@@ -53,9 +61,10 @@
                     height: 75%;
                 }
     .transport {
+        background-color: red;
         display: inline-block;
         float: left;
-        width: 25%;
+        width: 20%;
         height: 100%;
     }
         .transport > div {
